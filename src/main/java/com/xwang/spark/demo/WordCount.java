@@ -7,7 +7,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class WordCount {
@@ -15,8 +14,8 @@ public class WordCount {
     private static final Pattern SPACE = Pattern.compile(" ");
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Usage: JavaWordCount <file>");
+        if (args.length < 2) {
+            System.err.println("Usage: JavaWordCount <input> <output>");
             System.exit(1);
         }
         SparkConf sparkConf = new SparkConf().setAppName("JavaWordCount");
@@ -30,10 +29,7 @@ public class WordCount {
         JavaPairRDD<String, Integer> counts
                 = ones.reduceByKey(Integer::sum);
 
-        List<Tuple2<String, Integer>> output = counts.collect();
-        for (Tuple2<?, ?> tuple : output) {
-            System.out.println(tuple._1() + ": " + tuple._2());
-        }
+        counts.saveAsTextFile(args[1]);
         ctx.stop();
     }
 }
